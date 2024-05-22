@@ -34,7 +34,7 @@ qb_model_lasso = joblib.load('data/qb_lasso_model.pkl')
 qb_model_ridge = joblib.load('data/qb_ridge_model.pkl')
 qb_model_gb = joblib.load('data/qb_gb_model.pkl')
 qb_model_knn = joblib.load('data/qb_knn_model.pkl')
-qb_model_rf = joblib.load('data/qb_rf_model.joblib')
+qb_model_rf = joblib.load('qb_rf_model.joblib')
 
 with st.sidebar:
     selected = option_menu(
