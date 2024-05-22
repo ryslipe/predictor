@@ -152,152 +152,151 @@ if selected == 'Quarterbacks':
     if (week_starter) and (player_starter_1) and (player_starter_2):
     
         who_to_start(int(week_starter), player_starter_1, player_starter_2)
-  
+
+
+
+    # using the model to make it work
+    quarterbacks_full = qb_train.copy()
+    # drop these columns
+    qb_dropping = ['position', 'recent_team', 'season',
+           'week', 'opponent_team', 'completions', 'attempts', 'passing_yards',
+           'passing_tds', 'interceptions', 'sack_fumbles_lost',
+           'passing_first_downs', 'carries', 'rushing_yards', 'rushing_tds',
+           'rushing_fumbles_lost', 'rushing_first_downs', 'receptions', 'targets',
+           'receiving_yards', 'receiving_tds', 'receiving_fumbles_lost',
+           'receiving_yards_after_catch', 'receiving_first_downs', 'target_share',
+           'usage', 'comp_percentage', 'rb_def_avg', 'wr_def_avg', 'te_def_avg', 
+           'last_twelve_receptions',
+           'last_twelve_targets', 'last_twelve_receiving_yards',
+           'last_twelve_receiving_tds', 'last_twelve_receiving_fumbles_lost',
+           'last_twelve_receiving_yards_after_catch',
+           'last_twelve_receiving_first_downs', 'last_twelve_target_share', 'last_twelve_usage']
     
+    ### FUNCTION 6
+    def drop_columns(df, columns_to_drop):
+        '''Drop the columns we will not be using for our analysis on quarterbacks along with na values.'''
+        df.drop(columns = columns_to_drop, axis = 1, inplace = True)
+        return 
+    
+    
+    # now we have only the columns that we need.
+    drop_columns(qb_train, qb_dropping)
+    
+    # drop na values
+    qb_train.dropna(inplace = True)
+    
+    
+    # create X and y variables.
+    X_train_qb = qb_train.drop(columns = ['player_id', 'player_display_name', 'fantasy_points_ppr'], axis = 1)
+    y_train_qb = qb_train['fantasy_points_ppr'] 
+    
+    
+    # create our pipeline
+    pipelines = {
+        'knn': make_pipeline(StandardScaler(), KNeighborsRegressor()),
+        'gb' : make_pipeline(StandardScaler(), GradientBoostingRegressor()),
+        'ridge': make_pipeline(StandardScaler(), Ridge()),
+        'lasso': make_pipeline(StandardScaler(), Lasso())
+    }
+    
+    # these will be our 5 models. It will fit to our training data and create a dictionary of each model. 
+    # try to make that into a function.
+    def model_creation(X, y):
+        dic = {}
+        for algo, pipeline in pipelines.items():
+            model = pipeline.fit(X, y)
+            dic[algo] = model
+        return dic
+    
+    
+    # call our function to fit the models 
+    qb_mods = model_creation(X_train_qb, y_train_qb)
+    
+    # rmse of every model
+    def full_train_rmse(model_dict, X, y):
+        '''A function to produce the RMSE on full training data without use of cross validation.'''
+        rmse_models = {}
+        for algo, model in model_dict.items():
+            # make a prediction on training data using each model
+            pred = model.predict(X)
+            # calculate mse
+            rmse = root_mean_squared_error(y, pred)
+            # calculate rmse
+            rmse_models[algo] = (rmse)
+        return rmse_models
+    
+    # call the function then print the results.
+    qb_train_rmse = full_train_rmse(qb_mods, X_train_qb, y_train_qb)
+    
+    # set up x and y values
+    x_val = ['knn', 'gb', 'ridge', 'lasso']
+    y_val = list(qb_train_rmse.values())
+    
+    
+    # Graph the results 
+    def make_rmse_plot(rmse_dict, title):
+        x_val = ['knn', 'gb', 'ridge', 'lasso']
+        y_val = list(rmse_dict.values())
+        # create the graph
+        fig_1, ax = plt.subplots()
+        ax.bar(x_val, y_val, color = ['Red', 'Green', 'Black', 'Orange', 'Blue'])
+        ax.set_title(title, fontsize = 24)
+        ax.set_ylabel('rmse', fontsize = 14)
+        ax.set_ylim([0, 9])
+        return fig_1
+    
+    # call the plotting function
+    fig_1 = make_rmse_plot(qb_train_rmse, 'RMSE Plot without Cross Validation')
+    if st.button('Generate RMSE Report'):
+        st.pyplot(fig_1)
+        
+    st.write('The results of the RMSE show that random forest is the best model but there is potenial for overfitting.')
+    
+    
+    qb_searched_mods = {}
+    qb_searched_mods['gb'] = qb_model_gb
+    qb_searched_mods['lasso'] = qb_model_lasso
+    qb_searched_mods['knn'] = qb_model_knn
+    qb_searched_mods['ridge'] = qb_model_ridge
+    
+    
+    
+    # generating cross val graph
+    ### ANOTHER FUNCTION (NUMBER IT)
+    def min_rmse(results):
+        '''Function to return the lowest RMSE score of each model.'''
+        # set up list for each cv score
+        scores = []
+        # find the 'neg_mean_squared_error' for each cv
+        for mean_score in results['mean_test_score']:
+            # get rmse by taking sqrt of neg mean_score
+                scores.append(np.sqrt(-mean_score))
+        # return lowest rmse
+        return min(scores)
+    
+    ### FUNCTION FOR ALL CV RMSE
+    def cv_rmse(searched_model_dict):
+        '''A function to get the lowest RMSE of our models.'''
+        all_rmse = {}
+        for algo, score in searched_model_dict.items():
+            result = min_rmse(searched_model_dict[algo].cv_results_)
+            all_rmse[algo] = result
+        return all_rmse
+    
+    # call function to create dictionary of all lowest RMSE of cross val models
+    qb_searched_rmse = cv_rmse(qb_searched_mods)
+    
+    
+    # call the plotting function
+    fig_2 = make_rmse_plot(qb_searched_rmse, 'Graph of Cross Validation RMSE')
+    if st.button('Generate Grid Searched RMSE Report'):
+        st.pyplot(fig_2)
+        
+    st.write('The results of the RMSE show that random forest was indeed overfitting. The lowest RMSE is from the Lasso model but they are all very close. This is the reason the model chosen was the Lasso model. In future rollouts, I will implement an ensemble of methods along with neural networks and time series analysis techniques.')
+
 if selected == 'Runningbacks':
     st.title(f'{selected} Coming Soon')
 if selected == 'Wide Receivers':
     st.title(f'{selected} Coming Soon')
 if selected == 'Tight Ends':
     st.title(f'{selected} Coming Soon')
-
-
-
-# using the model to make it work
-quarterbacks_full = qb_train.copy()
-# drop these columns
-qb_dropping = ['position', 'recent_team', 'season',
-       'week', 'opponent_team', 'completions', 'attempts', 'passing_yards',
-       'passing_tds', 'interceptions', 'sack_fumbles_lost',
-       'passing_first_downs', 'carries', 'rushing_yards', 'rushing_tds',
-       'rushing_fumbles_lost', 'rushing_first_downs', 'receptions', 'targets',
-       'receiving_yards', 'receiving_tds', 'receiving_fumbles_lost',
-       'receiving_yards_after_catch', 'receiving_first_downs', 'target_share',
-       'usage', 'comp_percentage', 'rb_def_avg', 'wr_def_avg', 'te_def_avg', 
-       'last_twelve_receptions',
-       'last_twelve_targets', 'last_twelve_receiving_yards',
-       'last_twelve_receiving_tds', 'last_twelve_receiving_fumbles_lost',
-       'last_twelve_receiving_yards_after_catch',
-       'last_twelve_receiving_first_downs', 'last_twelve_target_share', 'last_twelve_usage']
-
-### FUNCTION 6
-def drop_columns(df, columns_to_drop):
-    '''Drop the columns we will not be using for our analysis on quarterbacks along with na values.'''
-    df.drop(columns = columns_to_drop, axis = 1, inplace = True)
-    return 
-
-
-# now we have only the columns that we need.
-drop_columns(qb_train, qb_dropping)
-
-# drop na values
-qb_train.dropna(inplace = True)
-
-
-# create X and y variables.
-X_train_qb = qb_train.drop(columns = ['player_id', 'player_display_name', 'fantasy_points_ppr'], axis = 1)
-y_train_qb = qb_train['fantasy_points_ppr'] 
-
-
-# create our pipeline
-pipelines = {
-    'knn': make_pipeline(StandardScaler(), KNeighborsRegressor()),
-    'gb' : make_pipeline(StandardScaler(), GradientBoostingRegressor()),
-    'ridge': make_pipeline(StandardScaler(), Ridge()),
-    'lasso': make_pipeline(StandardScaler(), Lasso())
-}
-
-# these will be our 5 models. It will fit to our training data and create a dictionary of each model. 
-# try to make that into a function.
-def model_creation(X, y):
-    dic = {}
-    for algo, pipeline in pipelines.items():
-        model = pipeline.fit(X, y)
-        dic[algo] = model
-    return dic
-
-
-# call our function to fit the models 
-qb_mods = model_creation(X_train_qb, y_train_qb)
-
-# rmse of every model
-def full_train_rmse(model_dict, X, y):
-    '''A function to produce the RMSE on full training data without use of cross validation.'''
-    rmse_models = {}
-    for algo, model in model_dict.items():
-        # make a prediction on training data using each model
-        pred = model.predict(X)
-        # calculate mse
-        rmse = root_mean_squared_error(y, pred)
-        # calculate rmse
-        rmse_models[algo] = (rmse)
-    return rmse_models
-
-# call the function then print the results.
-qb_train_rmse = full_train_rmse(qb_mods, X_train_qb, y_train_qb)
-
-# set up x and y values
-x_val = ['knn', 'gb', 'ridge', 'lasso']
-y_val = list(qb_train_rmse.values())
-
-
-# Graph the results 
-def make_rmse_plot(rmse_dict, title):
-    x_val = ['knn', 'gb', 'ridge', 'lasso']
-    y_val = list(rmse_dict.values())
-    # create the graph
-    fig_1, ax = plt.subplots()
-    ax.bar(x_val, y_val, color = ['Red', 'Green', 'Black', 'Orange', 'Blue'])
-    ax.set_title(title, fontsize = 24)
-    ax.set_ylabel('rmse', fontsize = 14)
-    ax.set_ylim([0, 9])
-    return fig_1
-
-# call the plotting function
-fig_1 = make_rmse_plot(qb_train_rmse, 'RMSE Plot without Cross Validation')
-if st.button('Generate RMSE Report'):
-    st.pyplot(fig_1)
-    
-st.write('The results of the RMSE show that random forest is the best model but there is potenial for overfitting.')
-
-
-qb_searched_mods = {}
-qb_searched_mods['gb'] = qb_model_gb
-qb_searched_mods['lasso'] = qb_model_lasso
-qb_searched_mods['knn'] = qb_model_knn
-qb_searched_mods['ridge'] = qb_model_ridge
-
-
-
-# generating cross val graph
-### ANOTHER FUNCTION (NUMBER IT)
-def min_rmse(results):
-    '''Function to return the lowest RMSE score of each model.'''
-    # set up list for each cv score
-    scores = []
-    # find the 'neg_mean_squared_error' for each cv
-    for mean_score in results['mean_test_score']:
-        # get rmse by taking sqrt of neg mean_score
-            scores.append(np.sqrt(-mean_score))
-    # return lowest rmse
-    return min(scores)
-
-### FUNCTION FOR ALL CV RMSE
-def cv_rmse(searched_model_dict):
-    '''A function to get the lowest RMSE of our models.'''
-    all_rmse = {}
-    for algo, score in searched_model_dict.items():
-        result = min_rmse(searched_model_dict[algo].cv_results_)
-        all_rmse[algo] = result
-    return all_rmse
-
-# call function to create dictionary of all lowest RMSE of cross val models
-qb_searched_rmse = cv_rmse(qb_searched_mods)
-
-
-# call the plotting function
-fig_2 = make_rmse_plot(qb_searched_rmse, 'Graph of Cross Validation RMSE')
-if st.button('Generate Grid Searched RMSE Report'):
-    st.pyplot(fig_2)
-    
-st.write('The results of the RMSE show that random forest was indeed overfitting. The lowest RMSE is from the Lasso model but they are all very close. This is the reason the model chosen was the Lasso model. In future rollouts, I will implement an ensemble of methods along with neural networks and time series analysis techniques.')
