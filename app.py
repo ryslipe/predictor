@@ -1,0 +1,304 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon May 20 19:17:48 2024
+
+@author: ryans
+"""
+
+import streamlit as st
+import pandas as pd
+import numpy as np
+import joblib 
+import matplotlib.pyplot as plt
+from streamlit_option_menu import option_menu
+
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import Lasso, Ridge
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import root_mean_squared_error, mean_squared_error
+
+# best models 
+# te = ridge
+# wr = ridge
+# rb = ridge
+# qb = lasso
+
+df = pd.read_csv('qb_final_df')
+qb_train = pd.read_csv('qb_training')
+
+# upload our trained models so they don't take too long to run.
+qb_model_lasso = joblib.load('qb_lasso_model.pkl')
+qb_model_ridge = joblib.load('qb_ridge_model.pkl')
+qb_model_gb = joblib.load('qb_gb_model.pkl')
+qb_model_knn = joblib.load('qb_knn_model.pkl')
+qb_model_rf = joblib.load('qb_rf_model.pkl')
+
+with st.sidebar:
+    selected = option_menu(
+        menu_title = 'Main Menu',
+        options = ['Quarterbacks', 'Runningbacks', 'Wide Receivers', 'Tight Ends'],
+        default_index = 0
+        )
+
+if selected == 'Quarterbacks':    
+
+    # title of our app
+    st.title('Predicting Fantasy Points :football:')
+    
+    # introductory paragraph
+    st.write('Welcome to the Fantasy Football Machine Learning Predictor! In this first phase of rollouts, we are dealing with only quarterbacks. The data consists of training data fro the 2020, 2021, and first 13 weeks of the 2022 seasons. The model is then tested on the last 4 games of the 2022 season. Each season had the final game removed from the data because it is not representative of the population. In the final week of the season many teams rest their best players or play them in small amounts to avoid injury. We do not want this week to disturb the statistics used for prediction. The model uses a 12 weeek rolling average of various player statistics to come up with a prediction. For quarterbacks, a "lasso" model gave the lowest RMSE. It is tested on the last four weeks because this is generally the time frame of fantasy football playoff matchups.')
+    
+    # first section - player predictions
+    st.header('Player Predictions')
+    # explain the search bar
+    st.write('To view the results of the model enter a player that you would like to see predictions for. If the player has no data it means they did not play during the final 4 games of the season. The sortable table includes the player name along with the week and actual and predicted points scored. Click on the column to sort the predictions.')
+   
+    
+   # enter a player name to display predictions
+    text_search = st.text_input('Enter a player name', '')
+    m1 = df["Name"].str.contains(text_search.title())
+    
+    if text_search:
+        st.write(df[m1])
+    
+    # dataframe downloader
+    @st.cache_data
+    def df_converter(df):
+        return df.to_csv().encode('utf-8')
+    csv = df_converter(df)
+    st.write('\U0001F447 To see every quarterbacks predictions download the dataset here. \U0001F447')
+    st.download_button(
+     label="Download data as CSV",
+     data=csv,
+     file_name='wb_projections_df.csv',
+     mime='text/csv',
+ )
+    
+    
+    st.header('Week by Week Predictions')
+    st.write('Choose a week to display the predictions of every quarterback for the selected week.')
+    # choose a week to display 
+    text_2 = st.select_slider('Choose a Week Number', [14, 15, 16, 17])
+    
+    if text_2:
+        df.loc[df['Week'] == text_2]
+    
+    # function to make graph of comparisons
+    def compare(player_1, player_2):
+        '''A function to graph comparision.'''
+        first_line = df.loc[df['Name'] == player_1]
+        second_line = df.loc[df['Name'] == player_2]
+        
+        # graph them
+        fig, ax = plt.subplots()
+        ax.plot(first_line['Week'], first_line['Predicted'], label = player_1, marker = 'o')
+        ax.plot(second_line['Week'], second_line['Predicted'], label = player_2, marker = 'o')
+        plt.xticks([14, 15, 16, 17])
+        plt.title(f"Comparison of {player_1} and {player_2}")
+        plt.xlabel('Week')
+        plt.ylabel('Fantasy Points')
+        plt.legend()
+        return fig
+    
+    # next section - graphical comparison
+    st.header('Graphical Comparison')
+    st.write('To make comparisons of two players easy to interpret, enter two players for a line graph of the predicted points for the final 4 games of the 2022 season. ')
+    # input for player 1 and 2
+    player_1 = st.text_input('Enter First Player', '')
+    player_2 = st.text_input('Enter Second Player', '')
+    
+    if player_1 and player_2:
+        fig = compare(player_1, player_2)
+        st.pyplot(fig)
+        
+    
+    
+    def who_to_start(week, player_1, player_2):
+        '''A function to decide which player should start.'''
+        # subset of dataframe
+        player_1_name = df.loc[(df['Name'] == player_1) & (df['Week'] == week)]
+        player_1_points = player_1_name['Predicted'].tolist()
+        player_2_name = df.loc[(df['Name'] == player_2) & (df['Week'] == week)]
+        player_2_points = player_2_name['Predicted'].tolist()
+        if player_1_points and player_2_points:
+        
+            # names
+            names = [player_1, player_2]
+            # points
+            points = [player_1_points, player_2_points]
+            # zip them
+            most_points = max(points)
+            # who to start
+            starter = points.index(most_points)
+            best_player = names[starter]
+            st.write(f'Start {best_player}')
+            st.write(f'{player_1}: {player_1_points}')
+            st.write(f'{player_2}: {player_2_points}')
+        else:
+            st.write(f'Please Choose Two Players who are starting for week {week}.')
+    
+        # next section - who to start
+    st.header('Who to Start')  
+    # explain the "who to start" function
+    st.write('Do you have two players that you are unsure about starting? These tough decisions could be costly. Let the model make the decision for you. Type in the week you want along with the two players you are deciding between and the model will tell you who you should start. If the player entered is not playing in those weeks you will be asked to try again.')  
+    # input for player 1 and 2
+    week_starter = st.text_input('Enter a week for starting comparison')
+    player_starter_1 = st.text_input('Enter a player to start')
+    player_starter_2 = st.text_input('Enter a second player to start')
+    
+    if (week_starter) and (player_starter_1) and (player_starter_2):
+    
+        who_to_start(int(week_starter), player_starter_1, player_starter_2)
+  
+    
+if selected == 'Runningbacks':
+    st.title(f'{selected} Coming Soon')
+if selected == 'Wide Receivers':
+    st.title(f'{selected} Coming Soon')
+if selected == 'Tight Ends':
+    st.title(f'{selected} Coming Soon')
+
+
+
+# using the model to make it work
+quarterbacks_full = qb_train.copy()
+# drop these columns
+qb_dropping = ['position', 'recent_team', 'season',
+       'week', 'opponent_team', 'completions', 'attempts', 'passing_yards',
+       'passing_tds', 'interceptions', 'sack_fumbles_lost',
+       'passing_first_downs', 'carries', 'rushing_yards', 'rushing_tds',
+       'rushing_fumbles_lost', 'rushing_first_downs', 'receptions', 'targets',
+       'receiving_yards', 'receiving_tds', 'receiving_fumbles_lost',
+       'receiving_yards_after_catch', 'receiving_first_downs', 'target_share',
+       'usage', 'comp_percentage', 'rb_def_avg', 'wr_def_avg', 'te_def_avg', 
+       'last_twelve_receptions',
+       'last_twelve_targets', 'last_twelve_receiving_yards',
+       'last_twelve_receiving_tds', 'last_twelve_receiving_fumbles_lost',
+       'last_twelve_receiving_yards_after_catch',
+       'last_twelve_receiving_first_downs', 'last_twelve_target_share', 'last_twelve_usage']
+
+### FUNCTION 6
+def drop_columns(df, columns_to_drop):
+    '''Drop the columns we will not be using for our analysis on quarterbacks along with na values.'''
+    df.drop(columns = columns_to_drop, axis = 1, inplace = True)
+    return 
+
+
+# now we have only the columns that we need.
+drop_columns(qb_train, qb_dropping)
+
+# drop na values
+qb_train.dropna(inplace = True)
+
+
+# create X and y variables.
+X_train_qb = qb_train.drop(columns = ['player_id', 'player_display_name', 'fantasy_points_ppr'], axis = 1)
+y_train_qb = qb_train['fantasy_points_ppr'] 
+
+
+# create our pipeline
+pipelines = {
+    'knn': make_pipeline(StandardScaler(), KNeighborsRegressor()),
+    'rf' : make_pipeline(StandardScaler(), RandomForestRegressor()),
+    'gb' : make_pipeline(StandardScaler(), GradientBoostingRegressor()),
+    'ridge': make_pipeline(StandardScaler(), Ridge()),
+    'lasso': make_pipeline(StandardScaler(), Lasso())
+}
+
+# these will be our 5 models. It will fit to our training data and create a dictionary of each model. 
+# try to make that into a function.
+def model_creation(X, y):
+    dic = {}
+    for algo, pipeline in pipelines.items():
+        model = pipeline.fit(X, y)
+        dic[algo] = model
+    return dic
+
+
+# call our function to fit the models 
+qb_mods = model_creation(X_train_qb, y_train_qb)
+
+# rmse of every model
+def full_train_rmse(model_dict, X, y):
+    '''A function to produce the RMSE on full training data without use of cross validation.'''
+    rmse_models = {}
+    for algo, model in model_dict.items():
+        # make a prediction on training data using each model
+        pred = model.predict(X)
+        # calculate mse
+        rmse = root_mean_squared_error(y, pred)
+        # calculate rmse
+        rmse_models[algo] = (rmse)
+    return rmse_models
+
+# call the function then print the results.
+qb_train_rmse = full_train_rmse(qb_mods, X_train_qb, y_train_qb)
+
+# set up x and y values
+x_val = ['knn', 'rf', 'gb', 'ridge', 'lasso']
+y_val = list(qb_train_rmse.values())
+
+
+# Graph the results 
+def make_rmse_plot(rmse_dict, title):
+    x_val = ['knn', 'rf', 'gb', 'ridge', 'lasso']
+    y_val = list(rmse_dict.values())
+    # create the graph
+    fig_1, ax = plt.subplots()
+    ax.bar(x_val, y_val, color = ['Red', 'Green', 'Black', 'Orange', 'Blue'])
+    ax.set_title(title, fontsize = 24)
+    ax.set_ylabel('rmse', fontsize = 14)
+    ax.set_ylim([0, 9])
+    return fig_1
+
+# call the plotting function
+fig_1 = make_rmse_plot(qb_train_rmse, 'RMSE Plot without Cross Validation')
+if st.button('Generate RMSE Report'):
+    st.pyplot(fig_1)
+    
+st.write('The results of the RMSE show that random forest is the best model but there is potenial for overfitting.')
+
+
+qb_searched_mods = {}
+qb_searched_mods['gb'] = qb_model_gb
+qb_searched_mods['lasso'] = qb_model_lasso
+qb_searched_mods['knn'] = qb_model_knn
+qb_searched_mods['ridge'] = qb_model_ridge
+qb_searched_mods['rf'] = qb_model_rf
+
+
+# generating cross val graph
+### ANOTHER FUNCTION (NUMBER IT)
+def min_rmse(results):
+    '''Function to return the lowest RMSE score of each model.'''
+    # set up list for each cv score
+    scores = []
+    # find the 'neg_mean_squared_error' for each cv
+    for mean_score in results['mean_test_score']:
+        # get rmse by taking sqrt of neg mean_score
+            scores.append(np.sqrt(-mean_score))
+    # return lowest rmse
+    return min(scores)
+
+### FUNCTION FOR ALL CV RMSE
+def cv_rmse(searched_model_dict):
+    '''A function to get the lowest RMSE of our models.'''
+    all_rmse = {}
+    for algo, score in searched_model_dict.items():
+        result = min_rmse(searched_model_dict[algo].cv_results_)
+        all_rmse[algo] = result
+    return all_rmse
+
+# call function to create dictionary of all lowest RMSE of cross val models
+qb_searched_rmse = cv_rmse(qb_searched_mods)
+
+
+# call the plotting function
+fig_2 = make_rmse_plot(qb_searched_rmse, 'Graph of Cross Validation RMSE')
+if st.button('Generate Grid Searched RMSE Report'):
+    st.pyplot(fig_2)
+    
+st.write('The results of the RMSE show that random forest was indeed overfitting. The lowest RMSE is from the Lasso model but they are all very close. This is the reason the model chosen was the Lasso model. In future rollouts, I will implement an ensemble of methods along with neural networks and time series analysis techniques.')
