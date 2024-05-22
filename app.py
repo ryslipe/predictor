@@ -30,11 +30,11 @@ df = pd.read_csv('data/qb_final_df')
 qb_train = pd.read_csv('data/qb_training')
 
 # upload our trained models so they don't take too long to run.
-qb_model_lasso = joblib.load('qb_lasso_model.pkl')
-qb_model_ridge = joblib.load('qb_ridge_model.pkl')
-qb_model_gb = joblib.load('qb_gb_model.pkl')
-qb_model_knn = joblib.load('qb_knn_model.pkl')
-qb_model_rf = joblib.load('qb_rf_model.pkl')
+qb_model_lasso = joblib.load('data/qb_lasso_model.pkl')
+qb_model_ridge = joblib.load('data/qb_ridge_model.pkl')
+qb_model_gb = joblib.load('data/qb_gb_model.pkl')
+qb_model_knn = joblib.load('data/qb_knn_model.pkl')
+qb_model_rf = joblib.load('data/qb_rf_model.pkl')
 
 with st.sidebar:
     selected = option_menu(
