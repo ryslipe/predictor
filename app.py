@@ -250,7 +250,7 @@ if selected == 'Quarterbacks':
     if st.button('Generate RMSE Report'):
         st.pyplot(fig_1)
         
-    st.write('The results of the RMSE show that random forest is the best model but there is potenial for overfitting.')
+    st.write('The results of the RMSE are for the entire training set. Without cross validation we may have models that are overfit to the data so we will use cross validation to see how the RMSE changes.')
     
     
     qb_searched_mods = {}
@@ -292,7 +292,7 @@ if selected == 'Quarterbacks':
     if st.button('Generate Grid Searched RMSE Report'):
         st.pyplot(fig_2)
         
-    st.write('The results of the RMSE show that random forest was indeed overfitting. The lowest RMSE is from the Lasso model but they are all very close. This is the reason the model chosen was the Lasso model. In future rollouts, I will implement an ensemble of methods along with neural networks and time series analysis techniques.')
+    st.write('The results of the graph show the RMSE after implementing a GridSearchCV(). The Lasso model has the lowest RMSE and was chosen for predictions. In future rollouts, I will implement an ensemble of methods along with neural networks and time series analysis techniques.')
 
 if selected == 'Runningbacks':
     st.title(f'{selected} Coming Soon')
