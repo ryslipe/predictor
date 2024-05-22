@@ -26,8 +26,8 @@ from sklearn.metrics import root_mean_squared_error, mean_squared_error
 # rb = ridge
 # qb = lasso
 
-df = pd.read_csv('qb_final_df')
-qb_train = pd.read_csv('qb_training')
+df = pd.read_csv('data/qb_final_df')
+qb_train = pd.read_csv('data/qb_training')
 
 # upload our trained models so they don't take too long to run.
 qb_model_lasso = joblib.load('qb_lasso_model.pkl')
