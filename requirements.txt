@@ -43,6 +43,7 @@ scipy==1.13.0
 six==1.16.0
 spyder-kernels==2.4.4
 stack-data==0.6.3
+streamlit-option-menu==0.3.12
 threadpoolctl==3.5.0
 tornado==6.4
 traitlets==5.14.3
