@@ -145,7 +145,7 @@ if selected == 'Quarterbacks':
     # explain the "who to start" function
     st.write('Do you have two players that you are unsure about starting? These tough decisions could be costly. Let the model make the decision for you. Type in the week you want along with the two players you are deciding between and the model will tell you who you should start. If the player entered is not playing in those weeks you will be asked to try again.')  
     # input for player 1 and 2
-    week_starter = st.text_input('Enter a week for starting comparison')
+    week_starter = st.selectbox('Choose a week for starting comparison.', [14, 15, 16, 17])
     player_starter_1 = st.text_input('Enter a player to start')
     player_starter_2 = st.text_input('Enter a second player to start')
     
