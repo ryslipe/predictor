@@ -202,7 +202,6 @@ y_train_qb = qb_train['fantasy_points_ppr']
 # create our pipeline
 pipelines = {
     'knn': make_pipeline(StandardScaler(), KNeighborsRegressor()),
-    'rf' : make_pipeline(StandardScaler(), RandomForestRegressor()),
     'gb' : make_pipeline(StandardScaler(), GradientBoostingRegressor()),
     'ridge': make_pipeline(StandardScaler(), Ridge()),
     'lasso': make_pipeline(StandardScaler(), Lasso())
@@ -238,13 +237,13 @@ def full_train_rmse(model_dict, X, y):
 qb_train_rmse = full_train_rmse(qb_mods, X_train_qb, y_train_qb)
 
 # set up x and y values
-x_val = ['knn', 'rf', 'gb', 'ridge', 'lasso']
+x_val = ['knn', 'gb', 'ridge', 'lasso']
 y_val = list(qb_train_rmse.values())
 
 
 # Graph the results 
 def make_rmse_plot(rmse_dict, title):
-    x_val = ['knn', 'rf', 'gb', 'ridge', 'lasso']
+    x_val = ['knn', 'gb', 'ridge', 'lasso']
     y_val = list(rmse_dict.values())
     # create the graph
     fig_1, ax = plt.subplots()
@@ -267,7 +266,7 @@ qb_searched_mods['gb'] = qb_model_gb
 qb_searched_mods['lasso'] = qb_model_lasso
 qb_searched_mods['knn'] = qb_model_knn
 qb_searched_mods['ridge'] = qb_model_ridge
-qb_searched_mods['rf'] = qb_model_rf
+
 
 
 # generating cross val graph
