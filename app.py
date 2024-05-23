@@ -109,11 +109,11 @@ if selected == 'Quarterbacks':
         fig, ax = plt.subplots()
         ax.plot(first_line['player_display_name'], first_line['Predicted'], label = player_1, marker = 'o')
         ax.plot(second_line['player_display_name'], second_line['Predicted'], label = player_2, marker = 'o')
-        plt.xticks([14, 15, 16, 17])
-        plt.title(f"Comparison of {player_1} and {player_2}")
-        plt.xlabel('Week')
-        plt.ylabel('Fantasy Points')
-        plt.legend()
+        ax.xticks([14, 15, 16, 17])
+        ax.title(f"Comparison of {player_1} and {player_2}")
+        ax.xlabel('Week')
+        ax.ylabel('Fantasy Points')
+        ax.legend()
         return fig
     
     # next section - graphical comparison
