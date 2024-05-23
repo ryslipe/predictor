@@ -132,9 +132,9 @@ if selected == 'Quarterbacks':
     def who_to_start(week, player_1, player_2):
         '''A function to decide which player should start.'''
         # subset of dataframe
-        player_1_name = df.loc[(df['player_display_name'] == player_1) & (df['Week'] == week)]
+        player_1_name = df.loc[(df['player_display_name'] == player_1) & (df['week'] == week)]
         player_1_points = player_1_name['Predicted'].tolist()
-        player_2_name = df.loc[(df['player_display_name'] == player_2) & (df['Week'] == week)]
+        player_2_name = df.loc[(df['player_display_name'] == player_2) & (df['week'] == week)]
         player_2_points = player_2_name['Predicted'].tolist()
         if player_1_points and player_2_points:
         
@@ -142,7 +142,7 @@ if selected == 'Quarterbacks':
             names = [player_1, player_2]
             # points
             points = [player_1_points, player_2_points]
-            # zip them
+            # most points
             most_points = max(points)
             # who to start
             starter = points.index(most_points)
