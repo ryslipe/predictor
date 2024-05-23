@@ -30,7 +30,7 @@ from streamlit_extras.no_default_selectbox import selectbox
 quarterbacks_full = pd.read_csv('data/quarterbacks_full')
 df = pd.read_csv('data/qb_final_df')
 qb_train = pd.read_csv('data/qb_training')
-qb_test = pd.read_csv('data/qb_test')
+
 
 # upload our trained models so they don't take too long to run.
 qb_model_lasso = joblib.load('data/qb_lasso_model.pkl')
