@@ -19,6 +19,7 @@ from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import root_mean_squared_error, mean_squared_error
+from streamlit_extras.no_default_selectbox import selectbox
 
 # best models 
 # te = ridge
@@ -26,8 +27,10 @@ from sklearn.metrics import root_mean_squared_error, mean_squared_error
 # rb = ridge
 # qb = lasso
 
+quarterbacks_full = pd.read_csv('data/quarterbacks_full')
 df = pd.read_csv('data/qb_final_df')
 qb_train = pd.read_csv('data/qb_training')
+qb_test = pd.read_csv('data/qb_test')
 
 # upload our trained models so they don't take too long to run.
 qb_model_lasso = joblib.load('data/qb_lasso_model.pkl')
@@ -39,7 +42,7 @@ qb_model_rf = joblib.load('data/qb_rf_model.joblib')
 with st.sidebar:
     selected = option_menu(
         menu_title = 'Main Menu',
-        options = ['Quarterbacks', 'Runningbacks', 'Wide Receivers', 'Tight Ends'],
+        options = ['Quarterbacks', 'Runningbacks', 'Wide Receivers', 'Tight Ends', 'User Guide'],
         default_index = 0
         )
 
@@ -58,22 +61,32 @@ if selected == 'Quarterbacks':
    
     
    # enter a player name to display predictions
-    text_search = st.text_input('Enter a player name', '')
-    m1 = df["Name"].str.contains(text_search.title())
+    text_search = st.text_input('Enter a player name. If table is empty, player not found.', '')
+    # m1 = df["Name"].str.contains(text_search.title())
+    
+    # function to create table
+    def make_table(text_search):
+        table = df['player_display_name'].str.contains(text_search.title())
+        return table
+    
+    table = make_table(text_search)
     
     if text_search:
-        st.write(df[m1])
+        searched_table = df[table]
+        searched_table['season'].astype(str).str.replace(',', '')
+        st.write(searched_table)
     
     # dataframe downloader
     @st.cache_data
     def df_converter(df):
         return df.to_csv().encode('utf-8')
     csv = df_converter(df)
-    st.write('\U0001F447 To see every quarterbacks predictions download the dataset here. \U0001F447')
+    
+    st.write('\U0001F447 To see every quarterback''s predictions download the dataset here. \U0001F447')
     st.download_button(
      label="Download data as CSV",
      data=csv,
-     file_name='wb_projections_df.csv',
+     file_name='qb_projections_df.csv',
      mime='text/csv',
  )
     
@@ -84,18 +97,18 @@ if selected == 'Quarterbacks':
     text_2 = st.select_slider('Choose a Week Number', [14, 15, 16, 17])
     
     if text_2:
-        df.loc[df['Week'] == text_2]
+        df.loc[df['week'] == text_2]
     
     # function to make graph of comparisons
     def compare(player_1, player_2):
         '''A function to graph comparision.'''
-        first_line = df.loc[df['Name'] == player_1]
-        second_line = df.loc[df['Name'] == player_2]
+        first_line = df.loc[df['player_display_name'] == player_1]
+        second_line = df.loc[df['player_display_name'] == player_2]
         
         # graph them
         fig, ax = plt.subplots()
-        ax.plot(first_line['Week'], first_line['Predicted'], label = player_1, marker = 'o')
-        ax.plot(second_line['Week'], second_line['Predicted'], label = player_2, marker = 'o')
+        ax.plot(first_line['player_display_name'], first_line['Predicted'], label = player_1, marker = 'o')
+        ax.plot(second_line['player_display_name'], second_line['Predicted'], label = player_2, marker = 'o')
         plt.xticks([14, 15, 16, 17])
         plt.title(f"Comparison of {player_1} and {player_2}")
         plt.xlabel('Week')
@@ -107,8 +120,8 @@ if selected == 'Quarterbacks':
     st.header('Graphical Comparison')
     st.write('To make comparisons of two players easy to interpret, enter two players for a line graph of the predicted points for the final 4 games of the 2022 season. ')
     # input for player 1 and 2
-    player_1 = st.text_input('Enter First Player', '')
-    player_2 = st.text_input('Enter Second Player', '')
+    player_1 = st.text_input('Enter First Player', '').title()
+    player_2 = st.text_input('Enter Second Player', '').title()
     
     if player_1 and player_2:
         fig = compare(player_1, player_2)
@@ -145,14 +158,14 @@ if selected == 'Quarterbacks':
     # explain the "who to start" function
     st.write('Do you have two players that you are unsure about starting? These tough decisions could be costly. Let the model make the decision for you. Type in the week you want along with the two players you are deciding between and the model will tell you who you should start. If the player entered is not playing in those weeks you will be asked to try again.')  
     # input for player 1 and 2
-    week_starter = st.selectbox('Choose a week for starting comparison.', [14, 15, 16, 17])
+    week_starter = st.selectbox('Pick a week for starting comparison', [14, 15, 16, 17])
     player_starter_1 = st.text_input('Enter a player to start')
     player_starter_2 = st.text_input('Enter a second player to start')
     
     if (week_starter) and (player_starter_1) and (player_starter_2):
     
         who_to_start(int(week_starter), player_starter_1, player_starter_2)
-
+  
 
 
     # using the model to make it work
@@ -250,7 +263,7 @@ if selected == 'Quarterbacks':
     if st.button('Generate RMSE Report'):
         st.pyplot(fig_1)
         
-    st.write('The results of the RMSE are for the entire training set. Without cross validation we may have models that are overfit to the data so we will use cross validation to see how the RMSE changes.')
+    st.write('The results of the RMSE show that random forest is the best model but there is potenial for overfitting.')
     
     
     qb_searched_mods = {}
@@ -292,11 +305,66 @@ if selected == 'Quarterbacks':
     if st.button('Generate Grid Searched RMSE Report'):
         st.pyplot(fig_2)
         
-    st.write('The results of the graph show the RMSE after implementing a GridSearchCV(). The Lasso model has the lowest RMSE and was chosen for predictions. In future rollouts, I will implement an ensemble of methods along with neural networks and time series analysis techniques.')
-
+    st.write('The results of the plot show the RMSE values got higher but not by too much. The lowest RMSE is from the Lasso model but they are all very close. This is the reason the model chosen was the Lasso model. In future rollouts, I will implement an ensemble of methods along with neural networks and time series analysis techniques.')
+    
+    
+    st.header('Descriptive Statistics')
+    st.write('The descriptive statistics are displayed below. Since the range of values are much different it is imoprtant to scale the data for the Lasso model.')
+    st.write(qb_train.describe().T)
+    
+    st.write('One of the interesting parts of the data analysis is to look at the correlation of our features with our target variable. None of these are extremely correlated to the target alone, but with interactions among other variables, our predictions are quite accurate for most players. ')
+    corr_matrix = qb_train.iloc[:, 2:].corr()
+    st.write(corr_matrix['fantasy_points_ppr'].sort_values(ascending = False))
+    
+    st.write('We can get a graph of our players actual points from the training data along with the projected points from the testing data to see how they are trending.')
+    
+    
+    
+    # graph of the players training data along with testing data
+    qb_df = qb_train.copy()
+    player = set(qb_train['player_display_name'])
+    st.header('Projection Overlay')
+    st.write('Choose a player from the drop down menu to see their historical points graphed in black and their projections graphed in red. If there is no red line it means the player did not play in the final four weeks of the 2022 season.')
+    full_player = selectbox('Pick a player from the drop down menu.', player)
+    choice = full_player
+    master_set = pd.concat([quarterbacks_full, df], axis = 0, ignore_index = True)
+    df_final = df.copy()
+    
+    def full_graph(player, master_set):
+        '''Function to graph a player's actual from training and projected from testing.'''
+        # df of player 
+        actual = master_set.loc[master_set['player_display_name'] == player]
+        # reset index 
+        actual.reset_index(inplace = True)
+        # add index column
+        actual['index'] = actual.index
+        # points
+        y_vals = actual['fantasy_points_ppr']
+        fig3, ax = plt.subplots()
+        
+        test_projections = actual['Predicted']
+        ax.plot(actual['index'], y_vals, color = 'black', marker = 'o', label = 'Actual Points')
+        ax.plot(actual['index'], test_projections, color = 'red', marker = 'o', label = 'Predicted Points')
+        ax.set_title(f'Historic Points with Projection Overlay for {player}')
+        ax.set_ylabel('Fantasy Points')
+        ax.grid(True)
+        ax.legend()
+        return fig3
+        
+    
+    
+    if choice:
+        fig3 = full_graph(choice, master_set)
+        st.pyplot(fig3)
+        
+    
+    
 if selected == 'Runningbacks':
     st.title(f'{selected} Coming Soon')
 if selected == 'Wide Receivers':
     st.title(f'{selected} Coming Soon')
 if selected == 'Tight Ends':
     st.title(f'{selected} Coming Soon')
+if selected == 'User Guide':
+    st.title(f'{selected}')
+    st.write('Welcome to the user guide for the Fantasy Football Machine Learning Predictor.')
