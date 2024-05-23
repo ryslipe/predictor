@@ -113,7 +113,7 @@ if selected == 'Quarterbacks':
         ax.set_title(f"Comparison of {player_1} and {player_2}")
         ax.set_xlabel('Week')
         ax.set_ylabel('Fantasy Points')
-        ax.set_legend()
+        ax.legend()
         return fig
     
     # next section - graphical comparison
