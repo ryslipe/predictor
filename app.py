@@ -40,7 +40,7 @@ qb_model_knn = joblib.load('data/qb_knn_model.pkl')
 qb_model_rf = joblib.load('data/qb_rf_model.joblib')
 
 df['season'] = df['season'].astype(str)
-st.write(df)
+
 
 with st.sidebar:
     selected = option_menu(
@@ -57,9 +57,6 @@ if selected == 'Quarterbacks':
     # introductory paragraph
     st.write('Welcome to the Fantasy Football Machine Learning Predictor! In this first phase of rollouts, we are dealing with only quarterbacks. The data consists of training data fro the 2020, 2021, and first 13 weeks of the 2022 seasons. The model is then tested on the last 4 games of the 2022 season. Each season had the final game removed from the data because it is not representative of the population. In the final week of the season many teams rest their best players or play them in small amounts to avoid injury. We do not want this week to disturb the statistics used for prediction. The model uses a 12 weeek rolling average of various player statistics to come up with a prediction. For quarterbacks, a "lasso" model gave the lowest RMSE. It is tested on the last four weeks because this is generally the time frame of fantasy football playoff matchups.')
 
-    df_table = df.copy()
-
-    st.write(df_table.info())
     
     # first section - player predictions
     st.header('Player Predictions')
@@ -73,7 +70,7 @@ if selected == 'Quarterbacks':
     
     # function to create table
     def make_table(text_search):
-        table = df_table['player_display_name'].str.contains(text_search.title())
+        table = df['player_display_name'].str.contains(text_search.title())
         
         return table
     
