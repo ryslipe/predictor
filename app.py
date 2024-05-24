@@ -40,6 +40,7 @@ qb_model_knn = joblib.load('data/qb_knn_model.pkl')
 qb_model_rf = joblib.load('data/qb_rf_model.joblib')
 
 df['season'] = df['season'].astype(str)
+df['Predicted'] = df['Predicted'].round(2)
 
 
 with st.sidebar:
