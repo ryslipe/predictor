@@ -40,7 +40,7 @@ qb_model_knn = joblib.load('data/qb_knn_model.pkl')
 qb_model_rf = joblib.load('data/qb_rf_model.joblib')
 
 df['season'] = df['season'].astype(str)
-st.write(df.info())
+st.write(df)
 
 with st.sidebar:
     selected = option_menu(
