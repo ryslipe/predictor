@@ -67,8 +67,8 @@ if selected == 'Quarterbacks':
     # function to create table
     def make_table(text_search):
         table = df['player_display_name'].str.contains(text_search.title())
-        table['season'] = table['season'].astype(str)
-        return table
+        
+        return table.columns
     
     table = make_table(text_search)
     
