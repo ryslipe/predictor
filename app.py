@@ -39,6 +39,9 @@ qb_model_gb = joblib.load('data/qb_gb_model.pkl')
 qb_model_knn = joblib.load('data/qb_knn_model.pkl')
 qb_model_rf = joblib.load('data/qb_rf_model.joblib')
 
+df_table = df.copy()
+df_table['season'].astype(str)
+
 with st.sidebar:
     selected = option_menu(
         menu_title = 'Main Menu',
@@ -66,7 +69,7 @@ if selected == 'Quarterbacks':
     
     # function to create table
     def make_table(text_search):
-        table = df['player_display_name'].str.contains(text_search.title())
+        table = df_table['player_display_name'].str.contains(text_search.title())
         
         return table
     
