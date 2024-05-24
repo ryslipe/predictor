@@ -62,11 +62,12 @@ if selected == 'Quarterbacks':
     
    # enter a player name to display predictions
     text_search = st.text_input('Enter a player name. If table is empty, player not found.', '')
-    # m1 = df["Name"].str.contains(text_search.title())
+    
     
     # function to create table
     def make_table(text_search):
         table = df['player_display_name'].str.contains(text_search.title())
+        table['season'] = table['season'].astype(str)
         return table
     
     table = make_table(text_search)
