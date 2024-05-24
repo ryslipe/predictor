@@ -41,7 +41,7 @@ qb_model_rf = joblib.load('data/qb_rf_model.joblib')
 
 df_table = df.copy()
 df_table['season'] = df_table['season'].astype(str)
-st.write(df_table.info()
+st.write(df_table.info())
 with st.sidebar:
     selected = option_menu(
         menu_title = 'Main Menu',
