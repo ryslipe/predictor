@@ -40,7 +40,7 @@ qb_model_knn = joblib.load('data/qb_knn_model.pkl')
 qb_model_rf = joblib.load('data/qb_rf_model.joblib')
 
 df_table = df.copy()
-df_table['season'] = df_table['season'].astype(str)
+df_table['season'] = df_table['season'].replace(',', '', regex = True)
 
 with st.sidebar:
     selected = option_menu(
