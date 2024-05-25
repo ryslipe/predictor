@@ -170,7 +170,7 @@ if selected == 'Quarterbacks':
     
     if (week_starter) and (player_starter_1) and (player_starter_2):
     
-        who_to_start(int(week_starter), player_starter_1, player_starter_2)
+        who_to_start(int(week_starter), player_starter_1.title(), player_starter_2.title())
   
 
 
