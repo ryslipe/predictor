@@ -17,18 +17,20 @@ import pandas as pd
 
 
 # import training data
-df_train = pd.read_csv('data/train.csv')
+df_train = pd.read_csv('data/train_new.csv')
 
 # import testing data
-df_test = pd.read_csv('data/test.csv')
+df_test = pd.read_csv('data/test_new.csv')
 
 # qb training data
 qb_train = df_train.loc[df_train['position'] == 'QB'].copy()
 qb_train_df = qb_train.to_csv('qb_training', index = False)
 
+qb_train.drop(columns = 'def_fantasy_points', inplace = True)
 # quarterbacks data
 # Let's make a copy of the qb_train dataframe that still has the **player_display_name**, **season**, and **week** columns. We want to do this so that we can grab these columns after the predictions for the model have been made.
 quarterbacks_full = qb_train.copy()
+quarterbacks_full.to_csv('data/quarterbacks_full', index = False)
 
 # drop these columns
 qb_dropping = ['position', 'recent_team', 'season',
@@ -38,7 +40,7 @@ qb_dropping = ['position', 'recent_team', 'season',
        'rushing_fumbles_lost', 'rushing_first_downs', 'receptions', 'targets',
        'receiving_yards', 'receiving_tds', 'receiving_fumbles_lost',
        'receiving_yards_after_catch', 'receiving_first_downs', 'target_share',
-       'usage', 'comp_percentage', 'rb_def_avg', 'wr_def_avg', 'te_def_avg', 
+       'usage', 'comp_percentage', 
        'last_twelve_receptions',
        'last_twelve_targets', 'last_twelve_receiving_yards',
        'last_twelve_receiving_tds', 'last_twelve_receiving_fumbles_lost',
@@ -49,7 +51,7 @@ qb_dropping = ['position', 'recent_team', 'season',
 def drop_columns(df, columns_to_drop):
     '''Drop the columns we will not be using for our analysis on quarterbacks along with na values.'''
     df.drop(columns = columns_to_drop, axis = 1, inplace = True)
-    return 
+    return df
 
 
 # now we have only the columns that we need.
@@ -239,13 +241,13 @@ qb_gb = qb_mods_cv['gb']
 qb_ridge = qb_mods_cv['ridge']
 qb_lasso = qb_mods_cv['lasso']
 
-# we may only be using one of the models but we can save them all incase we want to deploy them and let the user work with them. 
+# we may only be using one of the models but we can save them all incase we want to deploy them and let the user #work with them. 
 import joblib
-joblib.dump(qb_knn, 'qb_knn_model.pkl')
-joblib.dump(qb_rf, 'qb_rf_model.pkl')
-joblib.dump(qb_gb, 'qb_gb_model.pkl')
-joblib.dump(qb_ridge, 'qb_ridge_model.pkl')
-joblib.dump(qb_lasso, 'qb_lasso_model.pkl')
+joblib.dump(qb_knn, 'qb_knn_model_new.pkl')
+joblib.dump(qb_rf, 'qb_rf_model_new.pkl')
+joblib.dump(qb_gb, 'qb_gb_model_new.pkl')
+joblib.dump(qb_ridge, 'qb_ridge_model_new.pkl')
+joblib.dump(qb_lasso, 'qb_lasso_model_new.pkl')
 
 #####################################################################################
 # Testing Data
@@ -260,6 +262,8 @@ drop_columns(qb_test, qb_dropping)
 
 # drop na 
 qb_test.dropna(inplace = True)
+qb_test.drop(columns = 'def_fantasy_points', inplace = True)
+qb_test_df = qb_test.to_csv('data/qb_test', index = False)
 
 # create X and y variables.
 X_test_qb = qb_test.drop(columns = ['player_id', 'player_display_name', 'fantasy_points_ppr'], axis = 1)
@@ -294,12 +298,14 @@ ypred = pd.Series(final_qb_predictions)
 qb_name_final = qb_test_full['player_display_name'].tolist()
 qb_week = qb_test_full['week'].tolist()
 qb_points = qb_test_full['fantasy_points_ppr'].tolist()
-qb_df_final = pd.DataFrame([qb_name_final, qb_week, qb_points, ypred]).T
-qb_df_final.rename({0: 'Name', 1: 'Week', 2: 'Actual', 3: 'Predicted'}, axis = 1, inplace = True)
-qb_df_final['Week'].unique()
+qb_season = qb_test_full['season'].tolist()
+qb_df_final = pd.DataFrame([qb_name_final, qb_week, qb_season, qb_points, ypred]).T
+qb_df_final.rename({0: 'player_display_name', 1: 'week', 2: 'season', 3:  'fantasy_points_ppr', 4: 'Predicted'}, axis = 1, inplace = True)
 
-qb_df_final.loc[qb_df_final['Week'] == 16]
+# check that our weeks match the testing data weeks 
+qb_df_final['week'].unique()
+
 
 
 # save to dataframe
-qb_df_final.to_csv('qb_final_df', index = False)
+qb_df_final.to_csv('data/qb_final_df', index = False)
