@@ -27,21 +27,19 @@ from streamlit_extras.no_default_selectbox import selectbox
 # rb = ridge
 # qb = lasso
 
-quarterbacks_full = pd.read_csv('data/quarterbacks_full')
-df = pd.read_csv('data/qb_final_df')
-qb_train = pd.read_csv('data/qb_training')
+quarterbacks_full = pd.read_csv('data/quarterbacks_train_new')
+df = pd.read_csv('data/qb_final_df_new')
+qb_train = pd.read_csv('data/qb_training_new')
 
+df_table = df.copy()
+df_table['season'] = df_table['season'].astype(str)
 
 # upload our trained models so they don't take too long to run.
-qb_model_lasso = joblib.load('data/qb_lasso_model.pkl')
-qb_model_ridge = joblib.load('data/qb_ridge_model.pkl')
-qb_model_gb = joblib.load('data/qb_gb_model.pkl')
-qb_model_knn = joblib.load('data/qb_knn_model.pkl')
-qb_model_rf = joblib.load('data/qb_rf_model.joblib')
-
-df['season'] = df['season'].astype(str)
-df['Predicted'] = df['Predicted'].round(2)
-
+qb_model_lasso = joblib.load('data/qb_lasso_model_new.pkl')
+qb_model_ridge = joblib.load('data/qb_ridge_model_new.pkl')
+qb_model_gb = joblib.load('data/qb_gb_model_new.pkl')
+qb_model_knn = joblib.load('data/qb_knn_model_new.pkl')
+qb_model_rf = joblib.load('data/qb_rf_model_new.joblib')
 
 with st.sidebar:
     selected = option_menu(
@@ -57,7 +55,6 @@ if selected == 'Quarterbacks':
     
     # introductory paragraph
     st.write('Welcome to the Fantasy Football Machine Learning Predictor! In this first phase of rollouts, we are dealing with only quarterbacks. The data consists of training data fro the 2020, 2021, and first 13 weeks of the 2022 seasons. The model is then tested on the last 4 games of the 2022 season. Each season had the final game removed from the data because it is not representative of the population. In the final week of the season many teams rest their best players or play them in small amounts to avoid injury. We do not want this week to disturb the statistics used for prediction. The model uses a 12 weeek rolling average of various player statistics to come up with a prediction. For quarterbacks, a "lasso" model gave the lowest RMSE. It is tested on the last four weeks because this is generally the time frame of fantasy football playoff matchups.')
-
     
     # first section - player predictions
     st.header('Player Predictions')
@@ -67,12 +64,11 @@ if selected == 'Quarterbacks':
     
    # enter a player name to display predictions
     text_search = st.text_input('Enter a player name. If table is empty, player not found.', '')
-    
+    # m1 = df["Name"].str.contains(text_search.title())
     
     # function to create table
     def make_table(text_search):
         table = df['player_display_name'].str.contains(text_search.title())
-        
         return table
     
     table = make_table(text_search)
@@ -115,11 +111,11 @@ if selected == 'Quarterbacks':
         fig, ax = plt.subplots()
         ax.plot(first_line['week'], first_line['Predicted'], label = player_1, marker = 'o')
         ax.plot(second_line['week'], second_line['Predicted'], label = player_2, marker = 'o')
-        ax.set_xticks([14, 15, 16, 17])
-        ax.set_title(f"Comparison of {player_1} and {player_2}")
-        ax.set_xlabel('Week')
-        ax.set_ylabel('Fantasy Points')
-        ax.legend()
+        plt.xticks([14, 15, 16, 17])
+        plt.title(f"Comparison of {player_1} and {player_2}")
+        plt.xlabel('Week')
+        plt.ylabel('Fantasy Points')
+        plt.legend()
         return fig
     
     # next section - graphical comparison
@@ -138,9 +134,9 @@ if selected == 'Quarterbacks':
     def who_to_start(week, player_1, player_2):
         '''A function to decide which player should start.'''
         # subset of dataframe
-        player_1_name = df.loc[(df['player_display_name'] == player_1) & (df['week'] == week)]
+        player_1_name = df.loc[(df['Name'] == player_1) & (df['Week'] == week)]
         player_1_points = player_1_name['Predicted'].tolist()
-        player_2_name = df.loc[(df['player_display_name'] == player_2) & (df['week'] == week)]
+        player_2_name = df.loc[(df['Name'] == player_2) & (df['Week'] == week)]
         player_2_points = player_2_name['Predicted'].tolist()
         if player_1_points and player_2_points:
         
@@ -148,7 +144,7 @@ if selected == 'Quarterbacks':
             names = [player_1, player_2]
             # points
             points = [player_1_points, player_2_points]
-            # most points
+            # zip them
             most_points = max(points)
             # who to start
             starter = points.index(most_points)
@@ -170,7 +166,7 @@ if selected == 'Quarterbacks':
     
     if (week_starter) and (player_starter_1) and (player_starter_2):
     
-        who_to_start(int(week_starter), player_starter_1.title(), player_starter_2.title())
+        who_to_start(int(week_starter), player_starter_1, player_starter_2)
   
 
 
@@ -189,7 +185,7 @@ if selected == 'Quarterbacks':
            'last_twelve_targets', 'last_twelve_receiving_yards',
            'last_twelve_receiving_tds', 'last_twelve_receiving_fumbles_lost',
            'last_twelve_receiving_yards_after_catch',
-           'last_twelve_receiving_first_downs', 'last_twelve_target_share', 'last_twelve_usage']
+           'last_twelve_receiving_first_downs', 'last_twelve_target_share', 'last_twelve_usage', 'def_fantasy_points']
     
     ### FUNCTION 6
     def drop_columns(df, columns_to_drop):
