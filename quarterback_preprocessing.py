@@ -26,7 +26,6 @@ df_test = pd.read_csv('data/test_new.csv')
 qb_train = df_train.loc[df_train['position'] == 'QB'].copy()
 qb_train_df = qb_train.to_csv('qb_training', index = False)
 
-qb_train.drop(columns = 'def_fantasy_points', inplace = True)
 # quarterbacks data
 # Let's make a copy of the qb_train dataframe that still has the **player_display_name**, **season**, and **week** columns. We want to do this so that we can grab these columns after the predictions for the model have been made.
 quarterbacks_full = qb_train.copy()
@@ -45,7 +44,7 @@ qb_dropping = ['position', 'recent_team', 'season',
        'last_twelve_targets', 'last_twelve_receiving_yards',
        'last_twelve_receiving_tds', 'last_twelve_receiving_fumbles_lost',
        'last_twelve_receiving_yards_after_catch',
-       'last_twelve_receiving_first_downs', 'last_twelve_target_share', 'last_twelve_usage']
+       'last_twelve_receiving_first_downs', 'last_twelve_target_share', 'last_twelve_usage', 'def_fantasy_points']
 
 ### FUNCTION 6
 def drop_columns(df, columns_to_drop):
