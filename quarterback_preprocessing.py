@@ -29,7 +29,7 @@ qb_train_df = qb_train.to_csv('qb_training', index = False)
 # quarterbacks data
 # Let's make a copy of the qb_train dataframe that still has the **player_display_name**, **season**, and **week** columns. We want to do this so that we can grab these columns after the predictions for the model have been made.
 quarterbacks_full = qb_train.copy()
-quarterbacks_full.to_csv('data/quarterbacks_full_new', index = False)
+quarterbacks_full.to_csv('data/quarterbacks_train_new', index = False)
 
 # drop these columns
 qb_dropping = ['position', 'recent_team', 'season',
