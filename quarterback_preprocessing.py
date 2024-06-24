@@ -261,8 +261,8 @@ drop_columns(qb_test, qb_dropping)
 
 # drop na 
 qb_test.dropna(inplace = True)
-qb_test.drop(columns = 'def_fantasy_points', inplace = True)
-qb_test_df = qb_test.to_csv('data/qb_test', index = False)
+
+qb_test_df = qb_test.to_csv('data/qb_test_new', index = False)
 
 # create X and y variables.
 X_test_qb = qb_test.drop(columns = ['player_id', 'player_display_name', 'fantasy_points_ppr'], axis = 1)
@@ -307,4 +307,4 @@ qb_df_final['week'].unique()
 
 
 # save to dataframe
-qb_df_final.to_csv('data/qb_final_df', index = False)
+qb_df_final.to_csv('data/qb_final_df_new', index = False)
