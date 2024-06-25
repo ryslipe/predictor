@@ -8,7 +8,7 @@ Created on Mon May 20 19:17:48 2024
 import streamlit as st
 import pandas as pd
 import numpy as np
-import joblib 
+from joblib import load
 import matplotlib.pyplot as plt
 from streamlit_option_menu import option_menu
 
@@ -35,10 +35,10 @@ df_table = df.copy()
 df_table['season'] = df_table['season'].astype(str)
 
 # upload our trained models so they don't take too long to run.
-qb_model_lasso = joblib.load('data/qb_lasso_model_new.pkl')
-qb_model_ridge = joblib.load('data/qb_ridge_model_new.pkl')
-qb_model_gb = joblib.load('data/qb_gb_model_new.pkl')
-qb_model_knn = joblib.load('data/qb_knn_model_new.pkl')
+qb_model_lasso = load('data/qb_lasso_model_new.pkl')
+qb_model_ridge = load('data/qb_ridge_model_new.pkl')
+qb_model_gb = load('data/qb_gb_model_new.pkl')
+qb_model_knn = load('data/qb_knn_model_new.pkl')
 
 with st.sidebar:
     selected = option_menu(
