@@ -208,10 +208,9 @@ if selected == 'Quarterbacks':
     y_train_qb = qb_train['fantasy_points_ppr'] 
     
     
-       # create our pipeline
+    # create our pipeline
     pipelines = {
         'knn': make_pipeline(StandardScaler(), KNeighborsRegressor()),
-        'rf' : make_pipeline(StandardScaler(), RandomForestRegressor()),
         'gb' : make_pipeline(StandardScaler(), GradientBoostingRegressor()),
         'ridge': make_pipeline(StandardScaler(), Ridge()),
         'lasso': make_pipeline(StandardScaler(), Lasso())
@@ -250,21 +249,18 @@ if selected == 'Quarterbacks':
     x_val = ['knn', 'gb', 'ridge', 'lasso']
     y_val = list(qb_train_rmse.values())
     
-    # Graph the results (Make a better graph down the road but this works for now)
+    
+    # Graph the results 
     def make_rmse_plot(rmse_dict, title):
-        x_val = ['knn', 'rf', 'gb', 'ridge', 'lasso']
+        x_val = ['knn', 'gb', 'ridge', 'lasso']
         y_val = list(rmse_dict.values())
         # create the graph
-        fig, ax = plt.subplots()
+        fig_1, ax = plt.subplots()
         ax.bar(x_val, y_val, color = ['Red', 'Green', 'Black', 'Orange', 'Blue'])
         ax.set_title(title, fontsize = 24)
         ax.set_ylabel('rmse', fontsize = 14)
         ax.set_ylim([0, 9])
-        plt.show()
-      
-    # call the plotting function
-    title = 'RMSE Plot without Cross Validation'
-    make_rmse_plot(qb_train_rmse, title)
+        return fig_1
     
     # call the plotting function
     fig_1 = make_rmse_plot(qb_train_rmse, 'RMSE Plot without Cross Validation')
