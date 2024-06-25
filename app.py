@@ -208,9 +208,10 @@ if selected == 'Quarterbacks':
     y_train_qb = qb_train['fantasy_points_ppr'] 
     
     
-    # create our pipeline
+       # create our pipeline
     pipelines = {
         'knn': make_pipeline(StandardScaler(), KNeighborsRegressor()),
+        'rf' : make_pipeline(StandardScaler(), RandomForestRegressor()),
         'gb' : make_pipeline(StandardScaler(), GradientBoostingRegressor()),
         'ridge': make_pipeline(StandardScaler(), Ridge()),
         'lasso': make_pipeline(StandardScaler(), Lasso())
