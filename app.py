@@ -99,8 +99,9 @@ if selected == 'Quarterbacks':
     text_2 = st.select_slider('Choose a Week Number', [14, 15, 16, 17])
     
     if text_2:
-        df.loc[df['week'] == text_2]
         df['season'] = df['season'].astype(str).str.replace(',', '')
+        df.loc[df['week'] == text_2]
+        
     
     # function to make graph of comparisons
     def compare(player_1, player_2):
