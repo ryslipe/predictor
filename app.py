@@ -197,7 +197,7 @@ if selected == 'Quarterbacks':
     
     
     # now we have only the columns that we need.
-    drop_columns(qb_train, qb_dropping)
+    # drop_columns(qb_train, qb_dropping)
     
     # drop na values
     qb_train.dropna(inplace = True)
