@@ -14,6 +14,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import root_mean_squared_error, mean_squared_error
 import numpy as np
 import pandas as pd
+import joblib
 
 
 # import training data
@@ -24,7 +25,7 @@ df_test = pd.read_csv('data/test_new.csv')
 
 # qb training data
 qb_train = df_train.loc[df_train['position'] == 'QB'].copy()
-qb_train_df = qb_train.to_csv('qb_training_new', index = False)
+qb_train_df = qb_train.to_csv('data/qb_training_new', index = False)
 
 # quarterbacks data
 
@@ -122,19 +123,20 @@ y_val = list(qb_train_rmse.values())
 
 
 # Graph the results (Make a better graph down the road but this works for now)
-def make_rmse_plot(rmse_dict):
+def make_rmse_plot(rmse_dict, title):
     x_val = ['knn', 'rf', 'gb', 'ridge', 'lasso']
     y_val = list(rmse_dict.values())
     # create the graph
     fig, ax = plt.subplots()
     ax.bar(x_val, y_val, color = ['Red', 'Green', 'Black', 'Orange', 'Blue'])
-    ax.set_title('RMSE Bar Plot w/o CV', fontsize = 24)
+    ax.set_title(title, fontsize = 24)
     ax.set_ylabel('rmse', fontsize = 14)
     ax.set_ylim([0, 9])
     plt.show()
   
 # call the plotting function
-make_rmse_plot(qb_train_rmse)
+title = 'RMSE Plot without Cross Validation'
+make_rmse_plot(qb_train_rmse, title)
 
 
 
@@ -183,7 +185,8 @@ def grid_search_models(position_model_dict, X, y):
 
 # call the function
 qb_mods_cv = grid_search_models(qb_mods, X_train_qb, y_train_qb)
-
+# save the dictionary
+joblib.dump(qb_mods_cv, 'data/qb_mods_cv.joblib')
 
 ### ANOTHER FUNCTION (NUMBER IT)
 def min_rmse(results):
@@ -211,6 +214,10 @@ qb_searched_rmse = cv_rmse(qb_mods_cv)
 
 # call rmse printing function for neatly printed data.
 printing_rmse(qb_searched_rmse)
+
+# plot after CV
+title = 'RMSE Plot After Cross Validation'
+make_rmse_plot(qb_searched_rmse, title)
 
 
 # random forest model shows us feature importances
@@ -243,11 +250,11 @@ qb_lasso = qb_mods_cv['lasso']
 
 # we may only be using one of the models but we can save them all incase we want to deploy them and let the user #work with them. 
 import joblib
-joblib.dump(qb_knn, 'qb_knn_model_new.pkl')
-joblib.dump(qb_rf, 'qb_rf_model_new.pkl')
-joblib.dump(qb_gb, 'qb_gb_model_new.pkl')
-joblib.dump(qb_ridge, 'qb_ridge_model_new.pkl')
-joblib.dump(qb_lasso, 'qb_lasso_model_new.pkl')
+joblib.dump(qb_knn, 'data/qb_knn_model_new.joblib')
+joblib.dump(qb_rf, 'data/qb_rf_model_new.joblib')
+joblib.dump(qb_gb, 'data/qb_gb_model_new.joblib')
+joblib.dump(qb_ridge, 'data/qb_ridge_model_new.joblib')
+joblib.dump(qb_lasso, 'data/qb_lasso_model_new.joblib')
 
 #####################################################################################
 # Testing Data
