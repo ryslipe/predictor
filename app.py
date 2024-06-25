@@ -8,7 +8,7 @@ Created on Mon May 20 19:17:48 2024
 import streamlit as st
 import pandas as pd
 import numpy as np
-from joblib import load
+import joblib
 import matplotlib.pyplot as plt
 from streamlit_option_menu import option_menu
 
