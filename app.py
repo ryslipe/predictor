@@ -75,7 +75,7 @@ if selected == 'Quarterbacks':
     
     if text_search:
         searched_table = df[table]
-        searched_table['season'].astype(str).str.replace(',', '')
+        searched_table['season'] = searched_table['season'].astype(str).str.replace(',', '')
         st.write(searched_table)
     
     # dataframe downloader
