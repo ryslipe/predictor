@@ -270,10 +270,10 @@ if selected == 'Quarterbacks':
     
     
     qb_searched_mods = {}
-    qb_searched_mods['gb'] = qb_model_gb_new
-    qb_searched_mods['lasso'] = qb_model_lasso_new
-    qb_searched_mods['knn'] = qb_model_knn_new
-    qb_searched_mods['ridge'] = qb_model_ridge_new
+    #qb_searched_mods['gb'] = qb_model_gb_new
+    #qb_searched_mods['lasso'] = qb_model_lasso_new
+    #qb_searched_mods['knn'] = qb_model_knn_new
+    #qb_searched_mods['ridge'] = qb_model_ridge_new
     
     
     
