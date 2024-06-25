@@ -36,7 +36,6 @@ df_table['season'] = df_table['season'].astype(str)
 
 # upload our trained models so they don't take too long to run.
 qb_model_knn = joblib.load('data/qb_knn_model_new.joblib')
-qb_model_rf = joblib.load('data/qb_rf_model_new.joblib')
 qb_model_gb = joblib.load('data/qb_gb_model_new.joblib')
 qb_model_ridge = joblib.load('data/qb_ridge_model_new.joblib')
 qb_model_lasso = joblib.load('data/qb_lasso_model_new.joblib')
