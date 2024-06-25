@@ -249,18 +249,21 @@ if selected == 'Quarterbacks':
     x_val = ['knn', 'gb', 'ridge', 'lasso']
     y_val = list(qb_train_rmse.values())
     
-    
-    # Graph the results 
+    # Graph the results (Make a better graph down the road but this works for now)
     def make_rmse_plot(rmse_dict, title):
-        x_val = ['knn', 'gb', 'ridge', 'lasso']
+        x_val = ['knn', 'rf', 'gb', 'ridge', 'lasso']
         y_val = list(rmse_dict.values())
         # create the graph
-        fig_1, ax = plt.subplots()
+        fig, ax = plt.subplots()
         ax.bar(x_val, y_val, color = ['Red', 'Green', 'Black', 'Orange', 'Blue'])
         ax.set_title(title, fontsize = 24)
         ax.set_ylabel('rmse', fontsize = 14)
         ax.set_ylim([0, 9])
-        return fig_1
+        plt.show()
+      
+    # call the plotting function
+    title = 'RMSE Plot without Cross Validation'
+    make_rmse_plot(qb_train_rmse, title)
     
     # call the plotting function
     fig_1 = make_rmse_plot(qb_train_rmse, 'RMSE Plot without Cross Validation')
