@@ -35,10 +35,10 @@ df_table = df.copy()
 df_table['season'] = df_table['season'].astype(str)
 
 # upload our trained models so they don't take too long to run.
-qb_model_lasso = load('qb_lasso_model_new.pkl')
-qb_model_ridge = load('qb_ridge_model_new.pkl')
-qb_model_gb = load('qb_gb_model_new.pkl')
-qb_model_knn = load('qb_knn_model_new.pkl')
+qb_model_lasso = load('data/qb_lasso_model_new.pkl')
+qb_model_ridge = load('data/qb_ridge_model_new.pkl')
+qb_model_gb = load('data/qb_gb_model_new.pkl')
+qb_model_knn = load('data/qb_knn_model_new.pkl')
 
 with st.sidebar:
     selected = option_menu(
