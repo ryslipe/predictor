@@ -316,7 +316,7 @@ if selected == 'Quarterbacks':
         ax.plot(actual['period'], test_projections, color = 'red', marker = 'o', label = 'Predicted Points')
         ax.set_title(f'Historic Points with Projection Overlay for {player}')
         ax.set_ylabel('Fantasy Points')
-        ax.tick_params(axis = 'x', labelrotation = 45, fontsize = 10)
+        ax.tick_params(axis = 'x', labelrotation = 45, labelsize = 10)
         ax.grid(True)
         ax.legend()
         return fig3
