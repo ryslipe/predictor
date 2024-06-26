@@ -178,10 +178,37 @@ if selected == 'Quarterbacks':
 
     # using the model to make it work
     quarterbacks_full = qb_train.copy()
+    # drop these columns
+    qb_dropping = ['position', 'recent_team', 'season',
+           'week', 'opponent_team', 'completions', 'attempts', 'passing_yards',
+           'passing_tds', 'interceptions', 'sack_fumbles_lost',
+           'passing_first_downs', 'carries', 'rushing_yards', 'rushing_tds',
+           'rushing_fumbles_lost', 'rushing_first_downs', 'receptions', 'targets',
+           'receiving_yards', 'receiving_tds', 'receiving_fumbles_lost',
+           'receiving_yards_after_catch', 'receiving_first_downs', 'target_share',
+           'usage', 'comp_percentage', 
+           'last_twelve_receptions',
+           'last_twelve_targets', 'last_twelve_receiving_yards',
+           'last_twelve_receiving_tds', 'last_twelve_receiving_fumbles_lost',
+           'last_twelve_receiving_yards_after_catch',
+           'last_twelve_receiving_first_downs', 'last_twelve_target_share', 'last_twelve_usage', 'def_fantasy_points']
+    
+    ### FUNCTION 6
+    def drop_columns(df, columns_to_drop):
+        '''Drop the columns we will not be using for our analysis on quarterbacks along with na values.'''
+        df.drop(columns = columns_to_drop, axis = 1, inplace = True)
+        return df
     
     
+    # now we have only the columns that we need.
+    drop_columns(qb_train, qb_dropping)
+
+    st.header('Now look at qb_train')
+    st.write(qb_train)
     # drop na values
-    qb_train.dropna(inplace = True)
+    #qb_train.dropna(inplace = True)
+    
+   
     
     
     # create X and y variables.
