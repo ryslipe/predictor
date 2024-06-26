@@ -146,7 +146,8 @@ if selected == 'Quarterbacks':
             starter = points.index(most_points)
             best_player = names[starter]
             st.write(f'Start {best_player}')
-            st.write(f'{player_1}: {player_1_points}')
+            st.write('Player Predictions'
+            st.write(f'{player_1}: {player_1_points}.astype(str)')
             st.write(f'{player_2}: {player_2_points}')
         else:
             st.write(f'Please Choose Two Players who are starting for week {week}.')
