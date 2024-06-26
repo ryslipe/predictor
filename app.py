@@ -219,13 +219,6 @@ if selected == 'Quarterbacks':
     qb_train_rmse = full_train_rmse(qb_mods, X_train_qb, y_train_qb)
     qb_train_rmse.items()
     
-    # neat way to print the results
-    def printing_rmse(rmse_dict):
-        for k, v in rmse_dict.items():
-            st.write(k, ':',v)
-    
-    # call printing function with our dictionary
-    printing_rmse(qb_train_rmse)
     
     # bar graph of our rmse results
     import matplotlib.pyplot as plt
