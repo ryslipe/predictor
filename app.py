@@ -39,7 +39,7 @@ st.header('df - testing results with projections')
 st.write(df)
 
 st.header('qb_train')
-st.write('qb_train')
+st.write(qb_train)
 
 df_table = df.copy()
 df_table['season'] = df_table['season'].astype(str)
