@@ -239,7 +239,15 @@ def feature_importances(rf_model, X):
     return importances
 
 # call the function for our importances
-feature_importances(qb_mods_cv['rf'], X_train_qb)
+# call the function for our importances
+importances = feature_importances(qb_mods_cv['rf'], X_train_qb)
+
+# make importances a dataframe
+importances = pd.DataFrame(data = importances, columns = ['Importance', 'Feature'])
+importances = importances[['Feature', 'Importance']]
+
+# save feature importances dataframe as csv
+importances.to_csv('data/importances.csv', index = False)
 
 # save each of the models for future use just in case. 
 qb_knn = qb_mods_cv['knn']
