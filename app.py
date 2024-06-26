@@ -299,7 +299,7 @@ if selected == 'Quarterbacks':
     
     df_final = df.copy()
     
-     def full_graph(player, master_set):
+    def full_graph(player, master_set):
         '''Function to graph a player's actual from training and projected from testing.'''
         # df of player 
         actual = master_set.loc[master_set['player_display_name'] == player]
