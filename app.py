@@ -252,25 +252,8 @@ if selected == 'Quarterbacks':
     
     
     # random forest model shows us feature importances
-    feature_importances_qb = qb_mods_cv['rf'].best_estimator_._final_estimator.feature_importances_
-    
-    # set up the features for feature importance
-    attributes = list(X_train_qb.columns)
-    # importance of our features
-    sorted(zip(feature_importances_qb, attributes), reverse = True)
-    
-    # make a function that gets feature importances and prints it 
-    def feature_importances(rf_model, X):
-        '''Print the feature importances.'''
-        feature_importances = rf_model.best_estimator_._final_estimator.feature_importances_
-        # get columns to match feature importances
-        attributes = list(X.columns)
-        # importances
-        importances = sorted(zip(feature_importances, attributes), reverse = True)
-        return importances
-    
-    # call the function for our importances
-    importances = feature_importances(qb_mods_cv['rf'], X_train_qb)
+    importances = pd.read_csv('data/importances.csv')
+    st.write(importances)
     ######################################################################################################################################################
     # create our pipeline
     pipelines = {
