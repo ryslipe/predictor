@@ -309,7 +309,7 @@ if selected == 'Quarterbacks':
         actual['index'] = actual.index
         # points
         y_vals = actual['fantasy_points_ppr']
-        fig3, ax = plt.subplots()
+        fig3, ax = plt.subplots(figsize = (10, 6))
         
         test_projections = actual['predicted']
         ax.plot(actual['period'], y_vals, color = 'black', marker = 'o', label = 'Actual Points')
