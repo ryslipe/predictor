@@ -255,71 +255,14 @@ if selected == 'Quarterbacks':
     importances = pd.read_csv('data/importances.csv')
     st.write(importances)
     ######################################################################################################################################################
-    # create our pipeline
-    pipelines = {
-        'knn': make_pipeline(StandardScaler(), KNeighborsRegressor()),
-        'gb' : make_pipeline(StandardScaler(), GradientBoostingRegressor()),
-        'ridge': make_pipeline(StandardScaler(), Ridge()),
-        'lasso': make_pipeline(StandardScaler(), Lasso())
-    }
-    
-    # these will be our 5 models. It will fit to our training data and create a dictionary of each model. 
-    # try to make that into a function.
-    def model_creation(X, y):
-        dic = {}
-        for algo, pipeline in pipelines.items():
-            model = pipeline.fit(X, y)
-            dic[algo] = model
-        return dic
-    
-    
-    # call our function to fit the models 
-    qb_mods = model_creation(X_train_qb, y_train_qb)
-    
-    # rmse of every model
-    def full_train_rmse(model_dict, X, y):
-        '''A function to produce the RMSE on full training data without use of cross validation.'''
-        rmse_models = {}
-        for algo, model in model_dict.items():
-            # make a prediction on training data using each model
-            pred = model.predict(X)
-            # calculate mse
-            rmse = root_mean_squared_error(y, pred)
-            # calculate rmse
-            rmse_models[algo] = (rmse)
-        return rmse_models
-    
-    # call the function then print the results.
-    qb_train_rmse = full_train_rmse(qb_mods, X_train_qb, y_train_qb)
-    
-    # set up x and y values
-    x_val = ['knn', 'gb', 'ridge', 'lasso']
-    y_val = list(qb_train_rmse.values())
-    
-    
-    # Graph the results 
-    def make_rmse_plot(rmse_dict, title):
-        x_val = ['knn', 'gb', 'ridge', 'lasso']
-        y_val = list(rmse_dict.values())
-        # create the graph
-        fig_1, ax = plt.subplots()
-        ax.bar(x_val, y_val, color = ['Red', 'Green', 'Black', 'Orange', 'Blue'])
-        ax.set_title(title, fontsize = 24)
-        ax.set_ylabel('rmse', fontsize = 14)
-        ax.set_ylim([0, 9])
-        return fig_1
-    
     # call the plotting function
-    fig_1 = make_rmse_plot(qb_train_rmse, 'RMSE Plot without Cross Validation')
-    if st.button('Generate RMSE Report'):
-        st.pyplot(fig_1)
-        
-    st.write('The results of the RMSE show that random forest is the best model but there is potenial for overfitting.')
+    cv_rmse_dict = {'knn': 7.995205302511437,
+     'rf': 7.920867882577945,
+     'gb': 7.942460224774128,
+     'ridge': 7.88654632047547,
+     'lasso': 7.880494637687264}
     
-    
-    
-    # call the plotting function
-    fig_2 = make_rmse_plot(qb_searched_rmse, 'Graph of Cross Validation RMSE')
+    fig_2 = make_rmse_plot(cv_rmse_dict, 'Graph of Cross Validation RMSE', [7, 9])
     if st.button('Generate Grid Searched RMSE Report'):
         st.pyplot(fig_2)
         
