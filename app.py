@@ -33,7 +33,7 @@ qb_train = pd.read_csv('data/qb_training_new')
 
 df_table = df.copy()
 df_table['season'] = df_table['season'].astype(str)
-
+st.write(pip show scikit-learn)
 # upload our trained models so they don't take too long to run.
 #qb_model_knn = joblib.load('data/qb_knn_model_new.joblib')
 #qb_model_gb = joblib.load('data/qb_gb_model_new.joblib')
