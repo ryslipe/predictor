@@ -38,7 +38,7 @@ st.write(quarterbacks_full)
 st.header('df - testing results with projections')
 st.write(df)
 
-st.header('qb_train')
+st.header('qb_train - includes 2024 but has all categories not just rolling averages')
 st.write(qb_train)
 
 df_table = df.copy()
