@@ -317,39 +317,6 @@ if selected == 'Quarterbacks':
     st.write('The results of the RMSE show that random forest is the best model but there is potenial for overfitting.')
     
     
-    qb_searched_mods = {}
-    #qb_searched_mods['gb'] = qb_model_gb_new
-    #qb_searched_mods['lasso'] = qb_model_lasso_new
-    #qb_searched_mods['knn'] = qb_model_knn_new
-    #qb_searched_mods['ridge'] = qb_model_ridge_new
-    
-    
-    
-    # generating cross val graph
-    ### ANOTHER FUNCTION (NUMBER IT)
-    def min_rmse(results):
-        '''Function to return the lowest RMSE score of each model.'''
-        # set up list for each cv score
-        scores = []
-        # find the 'neg_mean_squared_error' for each cv
-        for mean_score in results['mean_test_score']:
-            # get rmse by taking sqrt of neg mean_score
-                scores.append(np.sqrt(-mean_score))
-        # return lowest rmse
-        return min(scores)
-    
-    ### FUNCTION FOR ALL CV RMSE
-    def cv_rmse(searched_model_dict):
-        '''A function to get the lowest RMSE of our models.'''
-        all_rmse = {}
-        for algo, score in searched_model_dict.items():
-            result = min_rmse(searched_model_dict[algo].cv_results_)
-            all_rmse[algo] = result
-        return all_rmse
-    
-    # call function to create dictionary of all lowest RMSE of cross val models
-    qb_searched_rmse = cv_rmse(qb_searched_mods)
-    
     
     # call the plotting function
     fig_2 = make_rmse_plot(qb_searched_rmse, 'Graph of Cross Validation RMSE')
