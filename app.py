@@ -290,7 +290,7 @@ if selected == 'Quarterbacks':
     choice = full_player
     master_set = pd.concat([quarterbacks_full, df], axis = 0, ignore_index = True)
     master_set['period'] = master_set['season'].astype(str) + master_set['week'].astype(str)
-    st.write(master_set['period'].unique()
+    st.write(master_set['period'].unique())
     
     df_final = df.copy()
     
