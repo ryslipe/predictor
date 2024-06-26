@@ -39,7 +39,7 @@ df_table['season'] = df_table['season'].astype(str)
 #qb_model_gb = joblib.load('data/qb_gb_model_new.joblib')
 #qb_model_ridge = joblib.load('data/qb_ridge_model_new.joblib')
 #qb_model_lasso = joblib.load('data/qb_lasso_model_new.joblib')
-#qb_mods_cv = joblib.load('data/qb_mods_cv.joblib')
+qb_mods_cv = joblib.load('data/qb_mods_cv.joblib')
 
 with st.sidebar:
     selected = option_menu(
