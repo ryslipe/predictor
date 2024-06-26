@@ -32,10 +32,10 @@ df = pd.read_csv('data/qb_final_df_new')
 df.rename(columns = {'Predicted': 'predicted'}, inplace = True)
 qb_train = pd.read_csv('data/qb_training_new')
 
-st.header('quarterbacks_full')
+st.header('quarterbacks_full - all stats not just rolling averages, includes 2024')
 st.write(quarterbacks_full)
 
-st.header('df')
+st.header('df - testing results with projections')
 st.write(df)
 
 st.header('qb_train')
