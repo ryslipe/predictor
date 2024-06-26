@@ -32,6 +32,15 @@ df = pd.read_csv('data/qb_final_df_new')
 df.rename(columns = {'Predicted': 'predicted'}, inplace = True)
 qb_train = pd.read_csv('data/qb_training_new')
 
+st.header('quarterbacks_full')
+st.write(quarterbacks_full)
+
+st.header('df')
+st.write(df)
+
+st.header('qb_train')
+st.write('qb_train')
+
 df_table = df.copy()
 df_table['season'] = df_table['season'].astype(str)
 
