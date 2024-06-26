@@ -29,6 +29,7 @@ from streamlit_extras.no_default_selectbox import selectbox
 
 quarterbacks_full = pd.read_csv('data/quarterbacks_train_new')
 df = pd.read_csv('data/qb_final_df_new')
+df.rename(columns = {'Predicted': 'predicted'}, inplace = True)
 qb_train = pd.read_csv('data/qb_training_new')
 
 df_table = df.copy()
