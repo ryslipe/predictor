@@ -252,7 +252,7 @@ if selected == 'Quarterbacks':
     
     
     # random forest model shows us feature importances
-    importances = pd.read_csv('data/importances.csv')
+    importances = pd.read_csv('/data/importances.csv')
     st.write(importances)
     ######################################################################################################################################################
     # create our pipeline
