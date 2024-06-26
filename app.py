@@ -105,8 +105,8 @@ if selected == 'Quarterbacks':
         
         # graph them
         fig, ax = plt.subplots()
-        ax.plot(first_line['week'], first_line['Predicted'], label = player_1, marker = 'o')
-        ax.plot(second_line['week'], second_line['Predicted'], label = player_2, marker = 'o')
+        ax.plot(first_line['week'], first_line['predicted'], label = player_1, marker = 'o')
+        ax.plot(second_line['week'], second_line['predicted'], label = player_2, marker = 'o')
         plt.xticks([14, 15, 16, 17])
         plt.title(f"Comparison of {player_1} and {player_2}")
         plt.xlabel('Week')
