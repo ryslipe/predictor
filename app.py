@@ -303,7 +303,7 @@ if selected == 'Quarterbacks':
         y_vals = actual['fantasy_points_ppr']
         fig3, ax = plt.subplots()
         
-        test_projections = actual['Predicted']
+        test_projections = actual['predicted']
         ax.plot(actual['index'], y_vals, color = 'black', marker = 'o', label = 'Actual Points')
         ax.plot(actual['index'], test_projections, color = 'red', marker = 'o', label = 'Predicted Points')
         ax.set_title(f'Historic Points with Projection Overlay for {player}')
