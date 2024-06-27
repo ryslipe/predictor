@@ -284,8 +284,6 @@ if selected == 'Quarterbacks':
     
     
     
-    
-    
     # graph of the players training data along with testing data
     qb_df = qb_train.copy()
     player = set(qb_train['player_display_name'])
@@ -297,8 +295,8 @@ if selected == 'Quarterbacks':
     master_set['period'] = master_set['season'].astype(str) + master_set['week'].astype(str)
     
     # take season 2024 out because we do not need it in this analysis
-    #master_set = master_set.loc[master_set['season'] < 2024]
-    st.write(master_set.info())
+    master_set = master_set.loc[master_set['season'] < 2024]
+    st.write(master_set)
     df_final = df.copy()
     
     def full_graph(player, master_set):
