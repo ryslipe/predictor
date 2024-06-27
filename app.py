@@ -297,8 +297,8 @@ if selected == 'Quarterbacks':
     master_set['period'] = master_set['season'].astype(str) + master_set['week'].astype(str)
     
     # take season 2024 out because we do not need it in this analysis
-    master_set = master_set.loc[master_set['season'] < 2024]
-    st.write(master_set)
+    #master_set = master_set.loc[master_set['season'] < 2024]
+    st.write(master_set.info())
     df_final = df.copy()
     
     def full_graph(player, master_set):
