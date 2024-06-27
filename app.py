@@ -295,7 +295,7 @@ if selected == 'Quarterbacks':
     master_set['period'] = master_set['season'].astype(str) + master_set['week'].astype(str)
     
     # take season 2024 out because we do not need it in this analysis
-    
+    st.write(master_set.info())
     st.write(master_set)
     df_final = df.copy()
     
